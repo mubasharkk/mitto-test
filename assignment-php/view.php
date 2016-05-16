@@ -77,7 +77,7 @@ and open the template in the editor.
 								<td><?php echo $file['attr']['filegroup'];?></td>
 								<td><?php echo $file['attr']['fileperms'];?></td>
 								<td><?php echo $file['attr']['file_age'];?></td>
-								<td><a class="btn btn-xs btn-success">Download</a></td>
+								<td><a target="_blank" href="download.php?code=<?php echo base64_encode("{$tmpDir}/{$file['filename']}");?>" class="btn btn-xs btn-success">Download</a></td>
 							</tr>
 							<?php endforeach;?>
 						</tbody>

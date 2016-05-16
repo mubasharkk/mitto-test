@@ -12,7 +12,7 @@ $fileSizeInKBs = TRUE;
 
 // get system temp dir
 $tmpDir = sys_get_temp_dir();
-//$tmpDir = '/asdasdas';
+$tmpDir = '/var/www/html/vislog/';
 
 $tmpDirData = new ReadTmp($tmpDir, $fileSizeInKBs);
 

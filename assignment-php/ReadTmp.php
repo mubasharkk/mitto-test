@@ -41,6 +41,12 @@ class ReadTmp {
 	$dir = scandir($this->dir, SCANDIR_SORT_ASCENDING);
 
 	foreach ($dir as $item) {
+	  
+	  // check if file still exists 
+	  if(!file_exists($this->dir . '/' . $item)){
+		continue;
+	  }
+	  
 	  // if item is directory
 	  if (is_dir($this->dir . '/' . $item)) {
 		$this->data['dir'][] = array('dirname' => $item);
