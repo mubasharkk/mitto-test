@@ -1,12 +1,14 @@
 <?php
 
+error_reporting(-1);
+ini_set('display_errors', 'On');
 
-// Get 'tmp' directory
+require_once 'ReadTmp.php';
 
-$tmp_dir = sys_get_temp_dir();
+$tmpDirData = new ReadTmp();
 
-$dir = scandir($tmp_dir, SCANDIR_SORT_ASCENDING);
-
-echo "<pre>";
-print_r($dir);
-
+try {
+  $tmpDirData->getDirFiles();
+} catch (Exception $ex) {
+  echo $ex->getMessage();
+}
