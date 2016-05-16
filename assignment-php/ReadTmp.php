@@ -28,7 +28,7 @@ class ReadTmp {
 
 	foreach ($dir as $item) {
 	  if (is_dir($this->dir . '/' . $item)) {
-		$this->data['dir'][] = $item;
+		$this->data['dir'][] = array('dirname' => $item);
 	  } else {
 		$this->data['files'][] = array('filename' => $item);
 	  }
@@ -36,6 +36,10 @@ class ReadTmp {
 
 	foreach ($this->data['files'] as $id => $file) {
 	  $this->data['files'][$id]['attr'] = $this->readFileAttr("{$this->dir}/{$file['filename']}");
+	}
+
+	foreach ($this->data['dir'] as $id => $dir) {
+	  $this->data['dir'][$id]['attr'] = $this->readDirAttr("{$this->dir}/{$dir['dirname']}");
 	}
 	
   }
@@ -121,6 +125,29 @@ class ReadTmp {
   
   function getData(){
 	return $this->data;
+  }
+  
+  function readDirAttr($dirname){
+	
+	$stat = stat($dirname);
+	
+	
+	$now = time(); // or your date as well
+	$datediff = $now - $stat['mtime'];
+	$file_age = ceil($datediff/(60*60*24));
+//	
+	$dirsize = ($this->fileSizeFormat) ?  round($stat['size'] / 1024, 3) : $stat['size'];
+	
+	return array(
+		'filesize' => $dirsize,
+		'fileowner' => posix_getpwuid($stat['uid'])['name'],
+		'filegroup' => posix_getgrgid($stat['gid'])['name'],
+		'fileperms' => $this->getFilePerms($dirname),
+		'filetype' => 'directory',
+		'last_modified' => date('Y-m-d h:i:s', $stat['mtime']),
+		'file_age' => $file_age, 
+	);
+	
   }
 
 }

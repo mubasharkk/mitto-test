@@ -16,6 +16,9 @@ try {
   
   $data = $tmpDirData->getData();
   
+//  echo "<pre>";
+//  print_r($data['dir']);
+//  die;
 } catch (Exception $ex) {
   echo $ex->getMessage();
 }

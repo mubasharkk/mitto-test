@@ -52,15 +52,15 @@ and open the template in the editor.
 						<tbody>
 							<?php foreach($data['dir'] as $dir):?>
 							<tr class="bg-info">
-								<td><?php echo $dir;?></td>
-								<td>Dir</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
-								<td>-</td>
+								<td><?php echo $dir['dirname'];?></td>
+								<td><?php echo $dir['attr']['filetype'];?></td>
+								<td><?php echo $dir['attr']['filesize'];?></td>
+								<td><?php echo $dir['attr']['last_modified'];?></td>
+								<td><?php echo $dir['attr']['fileowner'];?></td>
+								<td><?php echo $dir['attr']['filegroup'];?></td>
+								<td><?php echo $dir['attr']['fileperms'];?></td>
+								<td><?php echo $dir['attr']['file_age'];?></td>
+								<td><?php echo "-";?></td>
 							</tr>
 							<?php endforeach;?>
 							<?php foreach($data['files'] as $file):?>
@@ -73,7 +73,7 @@ and open the template in the editor.
 								<td><?php echo $file['attr']['filegroup'];?></td>
 								<td><?php echo $file['attr']['fileperms'];?></td>
 								<td><?php echo $file['attr']['file_age'];?></td>
-								<td><?php echo "-";?></td>
+								<td><a class="btn btn-xs btn-success">Download</a></td>
 							</tr>
 							<?php endforeach;?>
 						</tbody>
