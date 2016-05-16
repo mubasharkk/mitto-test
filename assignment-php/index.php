@@ -8,7 +8,7 @@ require_once 'ReadTmp.php';
 $fileSizeInKBs = TRUE;
 
 //$tmpDir = sys_get_temp_dir();
-$tmpDir = '/var/www/html/vislog/';
+$tmpDir = '/asdasdas';
 $tmpDirData = new ReadTmp($tmpDir, $fileSizeInKBs);
 
 try {

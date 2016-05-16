@@ -7,8 +7,11 @@
  */
 class ReadTmp {
 
+  // Processed Data
   private $data;
+  // Directory
   private $dir;
+  // FileSize to be in KBs
   private $fileSizeFormat;
 
   function __construct($dir, $fileSizeFormat = FALSE) {
@@ -22,52 +25,91 @@ class ReadTmp {
 	$this->dir = $dir;
   }
 
-  function getDirFiles() {
+  /**
+   * Get dir processed data
+   * 
+   * @throws Exception
+   */
+  public function getDirFiles() {
+	
+	// check if file exists
+	if(!file_exists($this->dir)){
+	  throw new Exception('Folder does not exists');
+	}
 
+	// Scan directory for files (Only first level)
 	$dir = scandir($this->dir, SCANDIR_SORT_ASCENDING);
 
 	foreach ($dir as $item) {
+	  // if item is directory
 	  if (is_dir($this->dir . '/' . $item)) {
 		$this->data['dir'][] = array('dirname' => $item);
-	  } else {
+	  } 
+	  // or item is file
+	  else {
 		$this->data['files'][] = array('filename' => $item);
 	  }
 	}
 
+	// Fetch file attributes
 	foreach ($this->data['files'] as $id => $file) {
 	  $this->data['files'][$id]['attr'] = $this->readFileAttr("{$this->dir}/{$file['filename']}");
 	}
 
+	// Fetch directory attributes
 	foreach ($this->data['dir'] as $id => $dir) {
 	  $this->data['dir'][$id]['attr'] = $this->readDirAttr("{$this->dir}/{$dir['dirname']}");
 	}
 	
   }
 
-  function readFileAttr($filename) {
+  /**
+   * Read file required file attributes
+   * 
+   * @param string $filename File name with path
+   * @return mixed
+   */
+  private function readFileAttr($filename) {
 	
+	// last modified time
 	$mtime = filemtime($filename);
 	
 	
-	$now = time(); // or your date as well
-	$datediff = $now - $mtime;
-	$file_age = ceil($datediff/(60*60*24));
+	$now = time(); // current timestamp
+	$datediff = $now - $mtime; // difference of modifed time stampe
+	$file_age = ceil($datediff/(60*60*24)); // calculate days 
 	
+	// get file size
 	$filesize = filesize($filename);
+	// if file size in KBs then calculate
 	$filesize = ($this->fileSizeFormat) ?  round($filesize / 1024, 3) : $filesize;
 	
 	return array(
 		'filesize' => $filesize,
+		// convert file ownership id to name
 		'fileowner' => posix_getpwuid(fileowner($filename))['name'],
+		// convert file group id to name
 		'filegroup' => posix_getgrgid(filegroup($filename))['name'],
+		// get file unix permissions
 		'fileperms' => $this->getFilePerms($filename),
+		// file type
 		'filetype' => filetype($filename),
+		// last modified datetimes
 		'last_modified' => date('Y-m-d h:i:s', $mtime),
+		// age of file in days
 		'file_age' => $file_age, 
 	);
   }
 
-  function getFilePerms($filename) {
+  /**
+   * Get file permissions in unix format
+   * 
+   * @param string $filename
+   * @return string
+   * 
+   * source : http://php.net/manual/de/function.fileperms.php
+   */
+  private function getFilePerms($filename) {
 	
 	$perms = fileperms($filename);
 		
@@ -123,19 +165,30 @@ class ReadTmp {
 	return $info;
   }
   
-  function getData(){
+  
+  /**
+   * Return folder information of files/dir
+   * 
+   * @return mixed
+   */
+  public function getData(){
 	return $this->data;
   }
   
+  /**
+   * Get directory attributes
+   * 
+   * @param string $dirname Directory names
+   * @return mixed
+   */
   function readDirAttr($dirname){
-	
+	// get directory stat
 	$stat = stat($dirname);
+		
+	$now = time(); // current time
+	$datediff = $now - $stat['mtime']; // difference of time
+	$file_age = ceil($datediff/(60*60*24)); // age of files in days
 	
-	
-	$now = time(); // or your date as well
-	$datediff = $now - $stat['mtime'];
-	$file_age = ceil($datediff/(60*60*24));
-//	
 	$dirsize = ($this->fileSizeFormat) ?  round($stat['size'] / 1024, 3) : $stat['size'];
 	
 	return array(
