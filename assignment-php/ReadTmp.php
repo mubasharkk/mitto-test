@@ -8,23 +8,26 @@
 class ReadTmp {
 
   private $data;
-  private $tmp_dir;
+  private $dir;
+  private $fileSizeFormat;
 
-  function __construct() {
+  function __construct($dir, $fileSizeFormat = FALSE) {
 	$this->data = array(
 		'dir' => array(),
 		'files' => array()
 	);
+	
+	$this->fileSizeFormat = $fileSizeFormat; 
 
-	$this->tmp_dir = sys_get_temp_dir();
+	$this->dir = $dir;
   }
 
   function getDirFiles() {
 
-	$dir = scandir($this->tmp_dir, SCANDIR_SORT_ASCENDING);
+	$dir = scandir($this->dir, SCANDIR_SORT_ASCENDING);
 
 	foreach ($dir as $item) {
-	  if (is_dir($this->tmp_dir . '/' . $item)) {
+	  if (is_dir($this->dir . '/' . $item)) {
 		$this->data['dir'][] = $item;
 	  } else {
 		$this->data['files'][] = array('filename' => $item);
@@ -32,26 +35,39 @@ class ReadTmp {
 	}
 
 	foreach ($this->data['files'] as $id => $file) {
-	  $this->data['files'][$id]['attr'] = $this->readFileAttr("{$this->tmp_dir}/{$file['filename']}");
+	  $this->data['files'][$id]['attr'] = $this->readFileAttr("{$this->dir}/{$file['filename']}");
 	}
-
-	echo "<pre>";
-	print_r($this->data);
+	
   }
 
   function readFileAttr($filename) {
+	
+	$mtime = filemtime($filename);
+	
+	
+	$now = time(); // or your date as well
+	$datediff = $now - $mtime;
+	$file_age = ceil($datediff/(60*60*24));
+	
+	$filesize = filesize($filename);
+	$filesize = ($this->fileSizeFormat) ?  round($filesize / 1024, 3) : $filesize;
+	
 	return array(
-		'filesize' => filesize($filename),
+		'filesize' => $filesize,
 		'fileowner' => posix_getpwuid(fileowner($filename))['name'],
 		'filegroup' => posix_getgrgid(filegroup($filename))['name'],
 		'fileperms' => $this->getFilePerms($filename),
 		'filetype' => filetype($filename),
-		'filemtime' => filemtime($filename),
+		'last_modified' => date('Y-m-d h:i:s', $mtime),
+		'file_age' => $file_age, 
 	);
   }
 
   function getFilePerms($filename) {
+	
 	$perms = fileperms($filename);
+		
+	$info = NULL;
 
 	if (($perms & 0xC000) == 0xC000) {
 	  // Socket
@@ -101,6 +117,10 @@ class ReadTmp {
 					(($perms & 0x0200) ? 'T' : '-'));
 
 	return $info;
+  }
+  
+  function getData(){
+	return $this->data;
   }
 
 }
