@@ -8,6 +8,7 @@ Write a PHP script reading all files from the temporary directory and creates an
 The following requirements must be met:
 
 *a)*  Sort the file list by filenames ascending in natural sort order, but show directories before files.
+
 *b)*  Output the file list as HTML table with the following columns:
 	- File name
 	- File size (in KB)
